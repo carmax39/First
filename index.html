@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NYC Street Food Market — Vendor Applications Open</title>
-  <meta name="description" content="Apply for a vendor spot at NYC Street Food Market. Affordable fees, high foot traffic, strong vendor community. Applications open now." />
-  <meta property="og:title" content="Vendor Applications Open — NYC Street Food Market" />
-  <meta property="og:description" content="Sell your food at one of NYC's newest street food markets. Apply today — no payment required." />
+  <title>Vendor Partnership | Prime Entertainment</title>
+  <meta name="description" content="Prime Entertainment is hosting a series of large-scale NYC street fairs in 2026. Apply to vend at Prospect Park, Union Square, and Washington Square Park." />
+  <meta property="og:title" content="Vendor Partnership Opportunity | Prime Entertainment" />
+  <meta property="og:description" content="Sell at NYC's biggest street fairs in 2026. Mobile ordering, high foot traffic, zero tech cost. Apply now." />
   <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -96,8 +96,8 @@
     .how-steps { display: grid; grid-template-columns: 1fr; gap: 32px; margin-top: 48px; }
     @media(min-width:640px){ .how-steps { grid-template-columns: repeat(3,1fr); gap: 24px; } }
     .how-num { font-family: var(--hf); font-size: 4rem; color: var(--amber); margin-bottom: 14px; line-height: 1; }
-    .how-step h3 { font-family: var(--hf); font-size: 1.5rem; letter-spacing: .03em; margin-bottom: 8px; color: var(--dark); }
-    .how-step p { font-size: .95rem; color: #555; line-height: 1.6; }
+    .how-step h3 { font-family: var(--hf); font-size: 1.5rem; letter-spacing: .03em; margin-bottom: 8px; color: var(--white); }
+    .how-step p { font-size: .95rem; color: #888; line-height: 1.6; }
 
     /* ============================================
        FORM
@@ -106,14 +106,14 @@
     .form-row { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
     @media(min-width:600px){ .form-row.r2 { grid-template-columns: 1fr 1fr; } }
     .form-field { display: flex; flex-direction: column; gap: 8px; }
-    .form-lbl { font-size: .88rem; font-weight: 600; letter-spacing: .02em; color: #ccc; }
-    .form-lbl span { color: var(--amber); }
-    .fi-input, .fi-ta { background: #242424; border: 1.5px solid #333; border-radius: 5px; color: var(--white); font-family: var(--bf); font-size: 1rem; padding: 13px 16px; transition: border-color .2s, box-shadow .2s; width: 100%; }
-    .fi-input::placeholder, .fi-ta::placeholder { color: #555; }
-    .fi-input:focus, .fi-ta:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,166,35,.18); }
+    .form-lbl span { color: var(--amber-d); }
+    .fi-input, .fi-ta { background: #fff; border: 1.5px solid #ccc; border-radius: 5px; color: var(--dark); font-family: var(--bf); font-size: 1rem; padding: 13px 16px; transition: border-color .2s, box-shadow .2s; width: 100%; }
+    .fi-input::placeholder, .fi-ta::placeholder { color: #aaa; }
+    .fi-input:focus, .fi-ta:focus { outline: none; border-color: var(--amber-d); box-shadow: 0 0 0 3px rgba(212,137,26,.15); }
+    .form-lbl { font-size: .88rem; font-weight: 600; letter-spacing: .02em; color: #333; }
     .fi-ta { resize: vertical; min-height: 110px; }
     .radio-g { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
-    .radio-l { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: .95rem; color: #ccc; }
+    .radio-l { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: .95rem; color: #333; }
     .radio-l input[type="radio"] { width: 18px; height: 18px; accent-color: var(--amber); cursor: pointer; flex-shrink: 0; }
     .sub-wrap { margin-top: 28px; }
     .sub-wrap .btn { width: 100%; font-size: 1.05rem; padding: 18px; }
@@ -137,6 +137,54 @@
     .faq-item.open .faq-a { max-height: 400px; padding: 4px 4px 0; }
 
     /* ============================================
+       STATS BAR
+       ============================================ */
+    #stats { background: var(--amber); padding: 36px 20px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px 16px; max-width: var(--mw); margin: 0 auto; }
+    @media(min-width:640px){ .stats-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(min-width:900px){ .stats-grid { grid-template-columns: repeat(5,1fr); } }
+    .stat { text-align: center; }
+    .stat-num { font-family: var(--hf); font-size: clamp(2rem,5vw,2.8rem); line-height: 1; color: var(--darker); letter-spacing: .02em; }
+    .stat-lbl { font-size: .78rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(0,0,0,.55); margin-top: 4px; }
+
+    /* ============================================
+       VENUE CARDS
+       ============================================ */
+    .venue-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 48px; }
+    @media(min-width:640px){ .venue-grid { grid-template-columns: repeat(3,1fr); } }
+    .venue-card { background: #1e1e1e; border: 1px solid #2a2a2a; border-top: 3px solid var(--amber); border-radius: 6px; padding: 28px 24px; transition: border-color .25s, transform .25s; }
+    .venue-card:hover { border-color: var(--amber); transform: translateY(-4px); }
+    .venue-card h3 { font-family: var(--hf); font-size: 1.5rem; letter-spacing: .03em; margin-bottom: 4px; }
+    .venue-tag { display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
+    .venue-card p { font-size: .9rem; color: #888; line-height: 1.6; }
+
+    /* ============================================
+       WHY VENDORS (6-card grid)
+       ============================================ */
+    .why6-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 48px; }
+    @media(min-width:600px){ .why6-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(min-width:900px){ .why6-grid { grid-template-columns: repeat(3,1fr); } }
+    .why6-card { background: #f7f3ec; border: 1px solid #e5ddd0; border-radius: 6px; padding: 28px 24px; transition: border-color .25s, transform .25s; }
+    .why6-card:hover { border-color: var(--amber-d); transform: translateY(-3px); }
+    .why6-icon { font-size: 1.4rem; font-weight: 700; color: var(--amber-d); margin-bottom: 12px; font-family: var(--hf); letter-spacing: .02em; }
+    .why6-card h3 { font-family: var(--hf); font-size: 1.3rem; letter-spacing: .03em; color: var(--dark); margin-bottom: 8px; }
+    .why6-card p { font-size: .9rem; color: #555; line-height: 1.65; }
+
+    /* ============================================
+       HOW IT WORKS — 4 steps
+       ============================================ */
+    @media(min-width:900px){ .how-steps { grid-template-columns: repeat(4,1fr); } }
+
+    /* ============================================
+       PARTICIPATION DETAILS
+       ============================================ */
+    .part-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 48px; }
+    @media(min-width:640px){ .part-grid { grid-template-columns: repeat(2,1fr); } }
+    .part-item { border-left: 3px solid var(--amber); padding: 20px 22px; background: #1e1e1e; border-radius: 0 6px 6px 0; }
+    .part-item h3 { font-family: var(--hf); font-size: 1.25rem; letter-spacing: .03em; margin-bottom: 8px; color: var(--white); }
+    .part-item p { font-size: .9rem; color: #999; line-height: 1.65; }
+
+    /* ============================================
        FOOTER
        ============================================ */
     #footer { background: var(--darker); border-top: 1px solid #222; padding: 48px 20px; text-align: center; }
@@ -152,91 +200,159 @@
 <!-- ===================== HERO ===================== -->
 <header id="hero">
   <div class="hero-in">
-    <div class="hero-eye fi">Vendor Applications Now Open</div>
-    <h1 class="hero-h1 fi">Your Food.<br/>Your <span>Hustle.</span><br/>Your Market.</h1>
-    <p class="hero-sub fi">Join <strong id="hero-name"></strong> and sell to thousands of hungry New Yorkers. Affordable fees, real foot traffic, and a community that has your back.</p>
+    <div class="hero-eye fi">Prime Entertainment · NYC 2026</div>
+    <h1 class="hero-h1 fi">Vendor Partnership<br/>Opportunity |<br/><span>NYC Street Fair<br/>Series 2026</span></h1>
+    <p class="hero-sub fi">Prime Entertainment is hosting a series of large-scale street fairs at three of New York City's most iconic parks — each drawing thousands of attendees.</p>
     <div class="hero-cta fi">
-      <a href="#apply" class="btn btn-a">Apply for a Spot</a>
-      <p class="hero-meta"><strong id="hero-date"></strong> &nbsp;·&nbsp; <span id="hero-loc"></span></p>
+      <a href="mailto:jonah@primentertainment.co" class="btn btn-a">Apply to Vend</a>
     </div>
   </div>
 </header>
 
 <main>
 
-<!-- ===================== WHY JOIN ===================== -->
-<section id="why" class="dk sp">
+<!-- ===================== STATS BAR ===================== -->
+<section id="stats">
+  <div class="stats-grid">
+    <div class="stat fi"><div class="stat-num">15</div><div class="stat-lbl">Events Planned</div></div>
+    <div class="stat fi"><div class="stat-num">4,000+</div><div class="stat-lbl">Est. Attendees / Event</div></div>
+    <div class="stat fi"><div class="stat-num">10</div><div class="stat-lbl">Vendor Spots / Event</div></div>
+    <div class="stat fi"><div class="stat-num">$53</div><div class="stat-lbl">Avg. Order Value</div></div>
+    <div class="stat fi"><div class="stat-num">100%</div><div class="stat-lbl">Mobile Orders</div></div>
+  </div>
+</section>
+
+<!-- ===================== EVENT VENUES ===================== -->
+<section id="venues" class="dk sp">
   <div class="wrap">
-    <p class="lbl fi">Why Vendors Love Us</p>
-    <h2 class="ttl fi">Built for NYC<br/>Street Food.</h2>
-    <p class="sub fi">We handle the setup. You handle the food. Here's what you get.</p>
-    <div class="why-grid">
-      <div class="why-card fi">
-        <div class="why-icon">🚶</div>
-        <h3>High Foot Traffic</h3>
-        <p>Prime NYC location means thousands of hungry customers walk past your stall every event day. No chasing customers — they come to you.</p>
+    <p class="lbl fi">Where We Operate</p>
+    <h2 class="ttl fi">Event Venues.</h2>
+    <p class="sub fi">Three of New York City's highest-traffic parks, spanning Brooklyn and Manhattan.</p>
+    <div class="venue-grid">
+      <div class="venue-card fi">
+        <h3>Prospect Park</h3>
+        <span class="venue-tag">Brooklyn</span>
+        <p>High-density residential catchment with a large, loyal local audience and strong repeat event attendance.</p>
       </div>
-      <div class="why-card fi">
-        <div class="why-icon">💰</div>
-        <h3>Affordable Fees</h3>
-        <p>We keep vendor costs low so your profit margin stays healthy. No hidden charges, no surprise fees on event day.</p>
+      <div class="venue-card fi">
+        <h3>Union Square Park</h3>
+        <span class="venue-tag">Manhattan</span>
+        <p>Major transit hub and commercial corridor — one of the most foot-trafficked intersections in New York City.</p>
       </div>
-      <div class="why-card fi">
-        <div class="why-icon">🤝</div>
-        <h3>Vendor Community</h3>
-        <p>Connect with other NYC food vendors, get market updates early, and have a dedicated point of contact before and during the event.</p>
+      <div class="venue-card fi">
+        <h3>Washington Square Park</h3>
+        <span class="venue-tag">Manhattan</span>
+        <p>Cultural landmark and tourist destination with a diverse mix of locals, visitors, and NYU students year-round.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===================== EVENT DETAILS ===================== -->
-<section id="details" class="lt sp">
+<!-- ===================== WHY VENDORS CHOOSE PRIME ===================== -->
+<section id="why" class="lt sp">
   <div class="wrap">
-    <p class="lbl fi">The Details</p>
-    <h2 class="ttl fi">Mark Your Calendar.</h2>
-    <p class="sub fi">Everything you need to know before you apply.</p>
-    <div class="det-grid fi">
-      <div class="det-card"><p class="det-lbl">Date</p><p class="det-val" id="d-date"></p></div>
-      <div class="det-card"><p class="det-lbl">Location</p><p class="det-val" id="d-loc"></p></div>
-      <div class="det-card"><p class="det-lbl">Vendor Fee</p><p class="det-val" id="d-fee"></p></div>
-      <div class="det-card"><p class="det-lbl">App. Deadline</p><p class="det-val" id="d-dl"></p></div>
+    <p class="lbl fi">The Case for Joining</p>
+    <h2 class="ttl fi">Why Vendors Choose<br/>Prime Entertainment.</h2>
+    <p class="sub fi">A purpose-built platform that puts more money in your pocket and less friction in your day.</p>
+    <div class="why6-grid">
+      <div class="why6-card fi">
+        <div class="why6-icon">&#8593; Higher Volume</div>
+        <h3>Higher Volume, Lower Overhead</h3>
+        <p>Prime Entertainment's mobile ordering system processes orders at high velocity — no register lines, no cash handling delays. Serve more customers per hour with the same crew.</p>
+      </div>
+      <div class="why6-card fi">
+        <div class="why6-icon">$ Revenue</div>
+        <h3>Increase Revenue Per Attendee</h3>
+        <p>The average order is $53 across beverages, mains, sides, and desserts. Attendees order from their phones throughout the event — not just during peak windows — unlocking incremental spend.</p>
+      </div>
+      <div class="why6-card fi">
+        <div class="why6-icon">&#9675; Intelligence</div>
+        <h3>Real-Time Demand Intelligence</h3>
+        <p>See live order volume, trending items, and inventory pacing through the vendor dashboard. Forecast prep accurately, reduce waste, and optimize your menu in real time.</p>
+      </div>
+      <div class="why6-card fi">
+        <div class="why6-icon">&#9733; Exposure</div>
+        <h3>Premium Exposure to Thousands</h3>
+        <p>Your menu is featured in the Prime Entertainment app alongside the event. Attendees browse all vendors before ordering — giving you visibility you wouldn't get from a physical booth alone.</p>
+      </div>
+      <div class="why6-card fi">
+        <div class="why6-icon">&#8635; Repeat Customers</div>
+        <h3>Repeat Customer Pipeline</h3>
+        <p>Capture transaction-level data on every sale: purchasing behavior, preferences, and frequency. Build direct customer relationships that extend far beyond a single event.</p>
+      </div>
+      <div class="why6-card fi">
+        <div class="why6-icon">&#10003; Zero Cost</div>
+        <h3>Zero Technology Cost</h3>
+        <p>Prime Entertainment provides the full ordering platform, payment processing via Stripe Connect, and CloudPRNT order fulfillment. No hardware to buy, no system to learn — just plug in and sell.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ===================== HOW IT WORKS ===================== -->
-<section id="how" class="lt sp" style="padding-top:0">
+<section id="how" class="dk sp">
   <div class="wrap">
     <p class="lbl fi">The Process</p>
     <h2 class="ttl fi">How It Works.</h2>
-    <p class="sub fi">Three easy steps from interested vendor to confirmed stall.</p>
+    <p class="sub fi">Four steps from application to your first sale.</p>
     <div class="how-steps">
       <div class="how-step fi">
         <div class="how-num">01</div>
-        <h3>Fill Out the Form</h3>
-        <p>Takes less than 3 minutes. Tell us about your food, your setup, and whether you have a vendor license. No payment today.</p>
+        <h3>Apply &amp; Get Selected</h3>
+        <p>Vendor spots are curated by cuisine category to ensure variety and avoid direct competition.</p>
       </div>
       <div class="how-step fi">
         <div class="how-num">02</div>
-        <h3>We Review Your App</h3>
-        <p>Our team reviews every application personally. We look at food type, setup, and licensing status to build a balanced market.</p>
+        <h3>Onboard to Prime Entertainment</h3>
+        <p>Upload your menu, connect Stripe, and receive your CloudPRNT ticket printer. Full setup support provided.</p>
       </div>
       <div class="how-step fi">
         <div class="how-num">03</div>
-        <h3>Get Your Confirmation</h3>
-        <p>Accepted vendors receive a confirmation email with stall assignment details, payment instructions, and setup guidelines.</p>
+        <h3>Show Up &amp; Sell</h3>
+        <p>Orders flow directly to your printer. Focus on food prep while Prime Entertainment handles the ordering queue.</p>
+      </div>
+      <div class="how-step fi">
+        <div class="how-num">04</div>
+        <h3>Get Paid</h3>
+        <p>Revenue settles directly to your bank account via Stripe Connect after each event.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PARTICIPATION DETAILS ===================== -->
+<section id="participation" class="dk sp" style="padding-top:0">
+  <div class="wrap">
+    <p class="lbl fi">What to Expect</p>
+    <h2 class="ttl fi">Participation Details.</h2>
+    <p class="sub fi">Everything that comes with being a Prime Entertainment vendor.</p>
+    <div class="part-grid">
+      <div class="part-item fi">
+        <h3>Cuisine Exclusivity</h3>
+        <p>Limited vendor spots per cuisine category to balance supply and demand and prevent oversaturation.</p>
+      </div>
+      <div class="part-item fi">
+        <h3>Event Network</h3>
+        <p>Top-performing vendors are invited to participate across all three parks, building a consistent presence throughout the season.</p>
+      </div>
+      <div class="part-item fi">
+        <h3>Data &amp; Insights</h3>
+        <p>Post-event performance report with sales data, peak hours, top-selling items, and customer demographics.</p>
+      </div>
+      <div class="part-item fi">
+        <h3>Insurance &amp; Compliance</h3>
+        <p>All events are fully permitted with COI coverage naming the City of New York and the event producer.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ===================== FORM ===================== -->
-<section id="apply" class="dk sp">
+<section id="apply" class="lt sp">
   <div class="wrap">
     <p class="lbl fi">Apply Now</p>
-    <h2 class="ttl fi">Claim Your Spot.</h2>
-    <p class="sub fi">Applications are reviewed on a rolling basis. Apply early for best availability.</p>
+    <h2 class="ttl fi">Interested in Vending?</h2>
+    <p class="sub fi">Vendor spots are limited and curated by cuisine category. Submit your interest and we'll be in touch.</p>
     <div class="form-wrap" style="margin-top:40px">
       <form id="vform" novalidate>
         <div class="form-row r2">
@@ -271,41 +387,18 @@
         </div>
         <div class="form-row">
           <div class="form-field fi">
-            <label class="form-lbl" for="f-setup">Tell us about your setup <span style="color:#555;font-weight:400">(optional)</span></label>
+            <label class="form-lbl" for="f-setup">Tell us about your setup <span style="color:#999;font-weight:400">(optional)</span></label>
             <textarea class="fi-ta" id="f-setup" name="setup" placeholder="Describe your cart, tent, truck, or table setup. Anything that helps us picture your stall."></textarea>
           </div>
         </div>
         <div class="sub-wrap fi">
-          <button type="submit" class="btn btn-a">Send My Application</button>
-          <p class="form-note">No payment required today. We'll follow up within 48 hours.</p>
+          <button type="submit" class="btn btn-a">Apply Now</button>
+          <p class="form-note">No payment required. We'll follow up within 48 hours.</p>
         </div>
       </form>
       <div id="ty">
         <h3>Application Received!</h3>
-        <p>Thanks for applying to <strong id="ty-name"></strong>. We'll review your info and get back to you within <strong>48 hours</strong>. Keep an eye on your inbox (and spam folder, just in case).</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== FAQ ===================== -->
-<section id="faq" class="lt sp">
-  <div class="wrap">
-    <p class="lbl fi">Questions</p>
-    <h2 class="ttl fi">FAQ.</h2>
-    <p class="sub fi">Still on the fence? Here are the questions we hear most.</p>
-    <div class="faq-list fi">
-      <div class="faq-item">
-        <button class="faq-q" aria-expanded="false">Do I need a NYC vendor permit to apply?<span class="faq-ic" aria-hidden="true">+</span></button>
-        <div class="faq-a" role="region"><p>You don't need a permit to <em>apply</em>, but you will need a valid NYC mobile food vending license or temporary food service permit before the event date. If you're in the process of obtaining one, go ahead and apply — select "In progress" and we'll share resources to help.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" aria-expanded="false">What types of food are accepted?<span class="faq-ic" aria-hidden="true">+</span></button>
-        <div class="faq-a" role="region"><p>We welcome all cuisines — from classic NYC street eats to international flavors, desserts, beverages, and specialty items. We aim to curate a diverse vendor mix so no two stalls are the same. Packaged goods and catering-only operations are evaluated case by case.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" aria-expanded="false">How much does a stall cost?<span class="faq-ic" aria-hidden="true">+</span></button>
-        <div class="faq-a" role="region"><p id="faq-fee"></p></div>
+        <p>Thanks for your interest in vending with <strong>Prime Entertainment</strong>. We'll review your application and follow up within <strong>48 hours</strong>. Keep an eye on your inbox.</p>
       </div>
     </div>
   </div>
@@ -319,7 +412,6 @@
     <p class="ft-logo" id="ft-name"></p>
     <div class="ft-links">
       <a class="ft-link" id="ft-email" href="#"><span id="ft-email-txt"></span></a>
-      <a class="ft-link" id="ft-ig" href="#" target="_blank" rel="noopener noreferrer"><span id="ft-ig-txt"></span></a>
     </div>
     <p class="ft-copy" id="ft-copy"></p>
   </div>
@@ -329,37 +421,19 @@
      CONFIG — update all placeholder values here
      ============================================ */
   const CONFIG = {
-    marketName: "NYC Street Food Market",
-    marketDate: "TBD — Coming Summer 2025",
-    location:   "New York City, NY",
-    vendorFee:  "TBD",
-    deadline:   "TBD",
-    email:      "hello@yourmarket.com",
-    instagram:  "@yourmarket"
+    companyName: "Prime Entertainment",
+    email:       "jonah@primentertainment.co"
   };
 
   /* ============================================
      POPULATE CONFIG VALUES INTO THE PAGE
      ============================================ */
   function populate() {
-    document.getElementById("hero-name").textContent = CONFIG.marketName;
-    document.getElementById("hero-date").textContent = CONFIG.marketDate;
-    document.getElementById("hero-loc").textContent  = CONFIG.location;
-    document.getElementById("d-date").textContent    = CONFIG.marketDate;
-    document.getElementById("d-loc").textContent     = CONFIG.location;
-    document.getElementById("d-fee").textContent     = CONFIG.vendorFee;
-    document.getElementById("d-dl").textContent      = CONFIG.deadline;
-    document.getElementById("ty-name").textContent   = CONFIG.marketName;
-    document.getElementById("ft-name").textContent   = CONFIG.marketName;
+    document.getElementById("ft-name").textContent      = CONFIG.companyName;
     document.getElementById("ft-email-txt").textContent = "✉ " + CONFIG.email;
-    document.getElementById("ft-email").href = "mailto:" + CONFIG.email;
-    document.getElementById("ft-ig-txt").textContent = "◆ " + CONFIG.instagram;
-    document.getElementById("ft-ig").href = "https://instagram.com/" + CONFIG.instagram.replace("@","");
-    document.getElementById("ft-copy").textContent = "© " + new Date().getFullYear() + " " + CONFIG.marketName + ". All rights reserved.";
-    document.getElementById("faq-fee").textContent = CONFIG.vendorFee === "TBD"
-      ? "Vendor fees are still being finalized. We're committed to keeping costs affordable for independent vendors. The exact amount will be confirmed with accepted applicants — no surprises."
-      : "Vendor stalls are " + CONFIG.vendorFee + ". Full details will be sent with your acceptance email.";
-    document.title = CONFIG.marketName + " — Vendor Applications Open";
+    document.getElementById("ft-email").href            = "mailto:" + CONFIG.email;
+    document.getElementById("ft-copy").textContent      = "© " + new Date().getFullYear() + " " + CONFIG.companyName + ". All rights reserved.";
+    document.title = "Vendor Partnership | " + CONFIG.companyName;
   }
 
   /* ============================================
@@ -396,29 +470,12 @@
 
     // ---- Wire your backend here (Formspree, Airtable, etc.) ----
     // fetch("YOUR_ENDPOINT", { method:"POST", body: new FormData(form) })
+    // Applications are directed to: jonah@primentertainment.co
 
     form.style.display = "none";
     var ty = document.getElementById("ty");
     ty.style.display = "block";
     ty.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
-
-  /* ============================================
-     FAQ ACCORDION
-     ============================================ */
-  document.querySelectorAll(".faq-q").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      var item = this.closest(".faq-item");
-      var isOpen = item.classList.contains("open");
-      document.querySelectorAll(".faq-item").forEach(function(i){
-        i.classList.remove("open");
-        i.querySelector(".faq-q").setAttribute("aria-expanded","false");
-      });
-      if (!isOpen) {
-        item.classList.add("open");
-        this.setAttribute("aria-expanded","true");
-      }
-    });
   });
 
   /* ============================================
