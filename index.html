@@ -3,9 +3,898 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World</title>
+  <title>Pricing Calculator — Passionfruit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* === CSS CUSTOM PROPERTIES === */
+    :root {
+      --pf-deep-purple:    #592B5E;
+      --pf-purple:         #763774;
+      --pf-purple-mid:     #6F346D;
+      --pf-purple-alt:     #6C336A;
+      --pf-dark-plum:      #3B1C3A;
+      --pf-near-black:     #2D152D;
+      --pf-yellow:         #FAC02E;
+      --pf-off-white:      #FFFDFA;
+      --pf-bg-light:       #F7F3F6;
+      --pf-bg-lavender:    #EADCEA;
+      --pf-bg-cream:       #FBF3DA;
+      --pf-subtle-yellow:  #FAEBC6;
+      --pf-pale-yellow:    #FBE4AC;
+    }
+
+    /* === GLOBAL RESET & BASE === */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    ::selection {
+      color: #1A0E1A;
+      background: #FAEBC6;
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--pf-dark-plum);
+      background: #FFFFFF;
+      line-height: 1.6;
+    }
+
+    /* === ANNOUNCEMENT BANNER === */
+    .announcement-banner {
+      background: var(--pf-deep-purple);
+      color: var(--pf-off-white);
+      font-size: 0.875rem;
+      padding: 10px 16px;
+      text-align: center;
+      position: relative;
+      z-index: 1000;
+    }
+
+    .announcement-banner.hidden {
+      display: none;
+    }
+
+    .announcement-banner-inner {
+      max-width: 1370px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .announcement-banner p {
+      margin: 0;
+      font-size: 0.875rem;
+    }
+
+    .announcement-banner a {
+      color: var(--pf-yellow);
+      text-decoration: underline;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    .announcement-banner a:hover {
+      opacity: 0.85;
+    }
+
+    .announcement-banner a .arrow-icon {
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .announcement-banner a:hover .arrow-icon {
+      transform: rotate(-45deg);
+    }
+
+    .banner-close {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--pf-off-white);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .banner-close:hover {
+      opacity: 1;
+    }
+
+    /* === MAIN NAVBAR === */
+    .navbar {
+      background: var(--pf-deep-purple);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      padding: 0 24px;
+    }
+
+    .navbar-inner {
+      max-width: 1370px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--pf-off-white);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .navbar-logo .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--pf-yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .navbar-logo .logo-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .navbar-links a {
+      color: var(--pf-off-white);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .navbar-links a:hover {
+      opacity: 0.85;
+    }
+
+    .nav-dropdown-icon {
+      width: 18px;
+      height: 18px;
+      stroke: var(--pf-off-white);
+      stroke-width: 2px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      transition: transform 0.2s;
+    }
+
+    .navbar-links li:hover .nav-dropdown-icon {
+      transform: rotate(180deg);
+    }
+
+    .navbar-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--pf-yellow);
+      color: var(--pf-dark-plum);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.55rem 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: filter 0.2s;
+    }
+
+    .navbar-cta:hover {
+      filter: brightness(0.95);
+    }
+
+    .navbar-cta svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--pf-dark-plum);
+      stroke-width: 1.5px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--pf-off-white);
+      margin: 5px 0;
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--pf-deep-purple);
+      z-index: 999;
+      padding: 80px 24px 24px;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .mobile-nav.open {
+      display: flex;
+    }
+
+    .mobile-nav a {
+      color: var(--pf-off-white);
+      text-decoration: none;
+      font-size: 1.25rem;
+      font-weight: 500;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .mobile-nav-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--pf-off-white);
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    .mobile-nav .navbar-cta {
+      align-self: flex-start;
+      margin-top: 16px;
+    }
+
+    /* === HERO WAVE DIVIDER === */
+    .hero-wave {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-top: -1px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* === CALCULATOR SECTION === */
+    .calculator-section {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+
+    .calculator-section h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--pf-dark-plum);
+      margin-bottom: 8px;
+    }
+
+    .calculator-section .subtitle {
+      font-size: 1rem;
+      color: var(--pf-purple);
+      margin-bottom: 48px;
+    }
+
+    /* Slider group */
+    .slider-group {
+      margin-bottom: 32px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .slider-label-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--pf-dark-plum);
+    }
+
+    .slider-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--pf-purple);
+      min-width: 100px;
+      text-align: right;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--pf-bg-lavender);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--pf-purple-mid);
+      border: 3px solid var(--pf-off-white);
+      box-shadow: 0 2px 6px rgba(59, 28, 58, 0.25);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--pf-purple-mid);
+      border: 3px solid var(--pf-off-white);
+      box-shadow: 0 2px 6px rgba(59, 28, 58, 0.25);
+      cursor: pointer;
+    }
+
+    /* === RESULT CARD === */
+    .result-card {
+      background: linear-gradient(262deg, #EADCEA 11.79%, #FAEBC6 88.21%);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      margin-top: 48px;
+    }
+
+    .plan-badge {
+      display: inline-block;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+
+    .plan-green {
+      background: #e6f9ee;
+      color: #1a7a3a;
+    }
+
+    .plan-blue {
+      background: #e3eefa;
+      color: #1a5296;
+    }
+
+    .plan-orange {
+      background: #fff3e0;
+      color: #b86e00;
+    }
+
+    .plan-red {
+      background: #fde8e8;
+      color: #c53030;
+    }
+
+    .result-card .price-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--pf-purple);
+      margin-bottom: 6px;
+    }
+
+    .result-card .price {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--pf-dark-plum);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .result-card .price-period {
+      font-size: 1rem;
+      color: var(--pf-purple);
+      margin-bottom: 6px;
+    }
+
+    .price-cap-note {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #c53030;
+      margin-bottom: 12px;
+    }
+
+    .price-cap-note:empty {
+      display: none;
+    }
+
+    .tier-reason {
+      font-size: 0.875rem;
+      color: rgba(59, 28, 58, 0.7);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* Cost breakdown */
+    .cost-breakdown {
+      text-align: left;
+      border-top: 1px solid rgba(118, 55, 116, 0.12);
+      padding-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 0.9rem;
+    }
+
+    .cost-row-label {
+      color: var(--pf-dark-plum);
+    }
+
+    .cost-row-value {
+      font-weight: 600;
+      color: var(--pf-dark-plum);
+    }
+
+    .cost-row.integrations-row .cost-row-label {
+      color: rgba(59, 28, 58, 0.65);
+      font-size: 0.85rem;
+    }
+
+    .cost-row.integrations-row .cost-row-value {
+      color: rgba(59, 28, 58, 0.65);
+      font-size: 0.85rem;
+    }
+
+    .integration-detail {
+      font-size: 0.8rem;
+      color: rgba(59, 28, 58, 0.5);
+      margin-top: 2px;
+      margin-bottom: 8px;
+    }
+
+    .cost-row.total-row {
+      border-top: 1px solid rgba(118, 55, 116, 0.12);
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+
+    .cost-row.total-row .cost-row-label {
+      font-weight: 600;
+    }
+
+    .cost-row.total-row .cost-row-value {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .annual-cost {
+      font-size: 0.9rem;
+      color: var(--pf-purple);
+      padding-top: 16px;
+      border-top: 1px solid rgba(118, 55, 116, 0.12);
+      text-align: center;
+    }
+
+    .annual-cost strong {
+      font-weight: 700;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      .navbar-links {
+        display: none;
+      }
+
+      .navbar-cta.desktop-cta {
+        display: none;
+      }
+
+      .hamburger {
+        display: block;
+      }
+
+      .calculator-section {
+        padding: 40px 16px 64px;
+      }
+
+      .calculator-section h1 {
+        font-size: 1.5rem;
+      }
+
+      .slider-label {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .slider-value {
+        text-align: left;
+      }
+
+      .result-card {
+        padding: 28px 20px;
+      }
+
+      .result-card .price {
+        font-size: 2.25rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello, World!</h1>
+
+  <!-- ===== ANNOUNCEMENT BANNER ===== -->
+  <div class="announcement-banner" id="announcementBanner">
+    <div class="announcement-banner-inner">
+      <p>
+        New: Programmatic cost calculator is live!
+        <a href="#calculator">
+          Try it now
+          <span class="arrow-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align: middle;">
+              <path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </a>
+      </p>
+    </div>
+    <button class="banner-close" id="bannerClose" aria-label="Close announcement">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ===== STICKY NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="navbar-logo">
+        <span class="logo-icon">
+          <svg viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="7" fill="#592B5E"/>
+            <circle cx="9" cy="9" r="4" fill="#FFFDFA"/>
+          </svg>
+        </span>
+        Passionfruit
+      </a>
+
+      <ul class="navbar-links">
+        <li>
+          <a href="#">
+            Platform
+            <svg class="nav-dropdown-icon" viewBox="0 0 18 18">
+              <path d="M4.5 7L9 11.5L13.5 7" fill="none"/>
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            Solutions
+            <svg class="nav-dropdown-icon" viewBox="0 0 18 18">
+              <path d="M4.5 7L9 11.5L13.5 7" fill="none"/>
+            </svg>
+          </a>
+        </li>
+        <li><a href="#">Pricing</a></li>
+        <li>
+          <a href="#">
+            Resources
+            <svg class="nav-dropdown-icon" viewBox="0 0 18 18">
+              <path d="M4.5 7L9 11.5L13.5 7" fill="none"/>
+            </svg>
+          </a>
+        </li>
+      </ul>
+
+      <a href="#" class="navbar-cta desktop-cta">
+        Sign up
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12"/>
+        </svg>
+      </a>
+
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <a href="#">Platform</a>
+    <a href="#">Solutions</a>
+    <a href="#">Pricing</a>
+    <a href="#">Resources</a>
+    <a href="#" class="navbar-cta">
+      Sign up
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" stroke="#3B1C3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- ===== HERO WAVE DIVIDER ===== -->
+  <svg class="hero-wave" viewBox="0 0 1440 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 72H1440V10.3C1440 10.3 1108.5 0 720 0C331.5 0 0 10.3 0 10.3V72Z" fill="#FFFFFF"/>
+  </svg>
+
+  <!-- ===== CALCULATOR ===== -->
+  <main class="calculator-section" id="calculator">
+    <h1>Pricing Calculator</h1>
+    <p class="subtitle">Adjust the sliders to estimate your monthly cost.</p>
+
+    <!-- Slider: Company size -->
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-label-text">Number of people in the company</span>
+        <span class="slider-value" id="companyVal">100 people</span>
+      </div>
+      <input type="range" id="companySlider" min="1" max="1000" step="1" value="100">
+    </div>
+
+    <!-- Slider: Marketing team -->
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-label-text">Number of people in the marketing team</span>
+        <span class="slider-value" id="marketingVal">10 people</span>
+      </div>
+      <input type="range" id="marketingSlider" min="1" max="100" step="1" value="10">
+    </div>
+
+    <!-- Slider: Revenue -->
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-label-text">Annual company revenue</span>
+        <span class="slider-value" id="revenueVal">$50M</span>
+      </div>
+      <input type="range" id="revenueSlider" min="1" max="500" step="1" value="50">
+    </div>
+
+    <!-- Slider: Integrations -->
+    <div class="slider-group">
+      <div class="slider-label">
+        <span class="slider-label-text">Number of integrations</span>
+        <span class="slider-value" id="integrationsVal">3 integrations</span>
+      </div>
+      <input type="range" id="integrationsSlider" min="1" max="25" step="1" value="3">
+    </div>
+
+    <!-- Result -->
+    <div class="result-card">
+      <div id="planBadge" class="plan-badge plan-blue">Explorer</div>
+      <div class="price-label">Total Monthly Cost</div>
+      <div class="price" id="priceDisplay">$8,000</div>
+      <div class="price-period">per month</div>
+      <div class="price-cap-note" id="priceCapNote"></div>
+      <div class="tier-reason" id="tierReason">Mid-size company, growing marketing team, strong revenue.</div>
+
+      <div class="cost-breakdown">
+        <div class="cost-row">
+          <span class="cost-row-label">Base price</span>
+          <span class="cost-row-value" id="baseCostDisplay">$8,000</span>
+        </div>
+        <div class="cost-row integrations-row">
+          <span class="cost-row-label">Integrations add-on</span>
+          <span class="cost-row-value" id="integrationsCostDisplay">+$0</span>
+        </div>
+        <div class="integration-detail" id="integrationsDetail">All integrations included free.</div>
+        <div class="cost-row total-row">
+          <span class="cost-row-label">Monthly total</span>
+          <span class="cost-row-value" id="totalCostDisplay">$8,000</span>
+        </div>
+      </div>
+
+      <div class="annual-cost">Annualized: <strong id="annualCost">$96,000</strong></div>
+    </div>
+  </main>
+
+  <script>
+    // === Banner dismiss ===
+    document.getElementById('bannerClose').addEventListener('click', function () {
+      document.getElementById('announcementBanner').classList.add('hidden');
+    });
+
+    // === Mobile nav ===
+    document.getElementById('hamburgerBtn').addEventListener('click', function () {
+      document.getElementById('mobileNav').classList.add('open');
+    });
+    document.getElementById('mobileNavClose').addEventListener('click', function () {
+      document.getElementById('mobileNav').classList.remove('open');
+    });
+
+    // === Calculator logic ===
+    var companySlider = document.getElementById('companySlider');
+    var marketingSlider = document.getElementById('marketingSlider');
+    var revenueSlider = document.getElementById('revenueSlider');
+    var integrationsSlider = document.getElementById('integrationsSlider');
+
+    function formatCurrency(n) {
+      return '$' + n.toLocaleString('en-US');
+    }
+
+    function getPlanName(marketing) {
+      if (marketing === 1) return 'Free Solo';
+      if (marketing <= 5) return 'Scout';
+      if (marketing <= 11) return 'Explorer';
+      return 'Armada';
+    }
+
+    function getPlanColor(baseCost) {
+      if (baseCost <= 6000) return 'plan-green';
+      if (baseCost <= 9500) return 'plan-blue';
+      if (baseCost === 11000) return 'plan-orange';
+      return 'plan-red';
+    }
+
+    function calculate() {
+      var company = parseInt(companySlider.value);
+      var marketing = parseInt(marketingSlider.value);
+      var revenue = parseInt(revenueSlider.value);
+      var integrations = parseInt(integrationsSlider.value);
+
+      // Update readouts
+      document.getElementById('companyVal').textContent = company.toLocaleString('en-US') + ' people';
+      document.getElementById('marketingVal').textContent = marketing + (marketing === 1 ? ' person' : ' people');
+      document.getElementById('revenueVal').textContent = '$' + revenue + 'M';
+      document.getElementById('integrationsVal').textContent = (integrations === 25 ? '25+' : integrations) + ' integration' + (integrations === 1 ? '' : 's');
+
+      var baseCost, reason;
+
+      // Rule 1: Revenue floor
+      if (revenue < 40) {
+        baseCost = 5500;
+        reason = 'Revenue under $40M \u2014 entry rate applied.';
+      }
+      // Rule 2: Small company or small marketing team
+      else if (company < 50 || marketing < 10) {
+        baseCost = 6000;
+        if (company < 50 && marketing < 10) {
+          reason = 'Company under 50 and marketing team under 10 \u2014 small-team rate applied.';
+        } else if (company < 50) {
+          reason = 'Company headcount under 50 \u2014 small-team rate applied.';
+        } else {
+          reason = 'Marketing team under 10 \u2014 small-team rate applied.';
+        }
+      }
+      // Rule 3: Scaled mid/large pricing
+      else {
+        var bigCompany = company >= 500;
+        var bigMarketing = marketing >= 20;
+        var highRevenue = revenue > 200;
+
+        if (!bigCompany && !bigMarketing && !highRevenue) {
+          baseCost = 8000;
+          reason = 'Mid-size company, growing marketing team, strong revenue.';
+        } else if (!bigCompany && !bigMarketing && highRevenue) {
+          baseCost = 9500;
+          reason = 'Mid-size company, growing marketing team, high revenue.';
+        } else if (!bigCompany && bigMarketing && !highRevenue) {
+          baseCost = 9500;
+          reason = 'Mid-size company, large marketing team, strong revenue.';
+        } else if (!bigCompany && bigMarketing && highRevenue) {
+          baseCost = 11000;
+          reason = 'Mid-size company, large marketing team, high revenue \u2014 premium tier.';
+        } else if (bigCompany && !bigMarketing && !highRevenue) {
+          baseCost = 9500;
+          reason = 'Large company, growing marketing team, strong revenue.';
+        } else if (bigCompany && !bigMarketing && highRevenue) {
+          baseCost = 11000;
+          reason = 'Large company, growing marketing team, high revenue \u2014 premium tier.';
+        } else if (bigCompany && bigMarketing && !highRevenue) {
+          baseCost = 11000;
+          reason = 'Large company, large marketing team \u2014 premium tier.';
+        } else {
+          baseCost = 12000;
+          reason = 'Large company, large marketing team, high revenue \u2014 maximum base tier.';
+        }
+      }
+
+      // Integrations add-on
+      var paidIntegrations = Math.max(0, integrations - 3);
+      var integrationCost = Math.floor(paidIntegrations / 2) * 750;
+      var totalMonthly = Math.min(baseCost + integrationCost, 12000);
+      var isCapped = (baseCost + integrationCost) > 12000;
+
+      // Plan name
+      var planName = getPlanName(marketing);
+      var planColor = getPlanColor(baseCost);
+
+      // Update DOM
+      var planBadge = document.getElementById('planBadge');
+      planBadge.textContent = planName;
+      planBadge.className = 'plan-badge ' + planColor;
+
+      document.getElementById('priceDisplay').textContent = formatCurrency(totalMonthly);
+      document.getElementById('priceCapNote').textContent = isCapped ? 'Price capped at $12,000/month.' : '';
+      document.getElementById('tierReason').textContent = reason;
+
+      document.getElementById('baseCostDisplay').textContent = formatCurrency(baseCost);
+      document.getElementById('integrationsCostDisplay').textContent = integrationCost > 0 ? '+' + formatCurrency(integrationCost) : '+$0';
+      document.getElementById('totalCostDisplay').textContent = formatCurrency(totalMonthly);
+
+      // Integrations detail text
+      var detailEl = document.getElementById('integrationsDetail');
+      if (integrations <= 3) {
+        detailEl.textContent = 'All integrations included free.';
+      } else {
+        var freeCount = 3;
+        var additionalCount = paidIntegrations;
+        var pairs = Math.floor(paidIntegrations / 2);
+        detailEl.textContent = freeCount + ' integrations included free + ' + additionalCount + ' additional = ' + pairs + ' billable pair' + (pairs !== 1 ? 's' : '') + ' = +' + formatCurrency(integrationCost) + '/month';
+      }
+
+      document.getElementById('annualCost').textContent = formatCurrency(totalMonthly * 12);
+    }
+
+    companySlider.addEventListener('input', calculate);
+    marketingSlider.addEventListener('input', calculate);
+    revenueSlider.addEventListener('input', calculate);
+    integrationsSlider.addEventListener('input', calculate);
+
+    calculate();
+  </script>
 </body>
 </html>
