@@ -449,79 +449,11 @@
       margin-bottom: 6px;
     }
 
-    .price-cap-note {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #c53030;
-      margin-bottom: 12px;
-    }
-
-    .price-cap-note:empty {
-      display: none;
-    }
-
     .tier-reason {
       font-size: 0.875rem;
       color: rgba(59, 28, 58, 0.7);
       margin-bottom: 20px;
       line-height: 1.5;
-    }
-
-    /* Cost breakdown */
-    .cost-breakdown {
-      text-align: left;
-      border-top: 1px solid rgba(118, 55, 116, 0.12);
-      padding-top: 20px;
-      margin-bottom: 20px;
-    }
-
-    .cost-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      font-size: 0.9rem;
-    }
-
-    .cost-row-label {
-      color: var(--pf-dark-plum);
-    }
-
-    .cost-row-value {
-      font-weight: 600;
-      color: var(--pf-dark-plum);
-    }
-
-    .cost-row.integrations-row .cost-row-label {
-      color: rgba(59, 28, 58, 0.65);
-      font-size: 0.85rem;
-    }
-
-    .cost-row.integrations-row .cost-row-value {
-      color: rgba(59, 28, 58, 0.65);
-      font-size: 0.85rem;
-    }
-
-    .integration-detail {
-      font-size: 0.8rem;
-      color: rgba(59, 28, 58, 0.5);
-      margin-top: 2px;
-      margin-bottom: 8px;
-    }
-
-    .cost-row.total-row {
-      border-top: 1px solid rgba(118, 55, 116, 0.12);
-      padding-top: 12px;
-      margin-top: 4px;
-    }
-
-    .cost-row.total-row .cost-row-label {
-      font-weight: 600;
-    }
-
-    .cost-row.total-row .cost-row-value {
-      font-weight: 700;
-      font-size: 1rem;
     }
 
     .annual-cost {
@@ -701,7 +633,7 @@
         <span class="slider-label-text">Number of people in the marketing team</span>
         <span class="slider-value" id="marketingVal">10 people</span>
       </div>
-      <input type="range" id="marketingSlider" min="1" max="100" step="1" value="10">
+      <input type="range" id="marketingSlider" min="1" max="30" step="1" value="10">
     </div>
 
     <!-- Slider: Revenue -->
@@ -728,24 +660,7 @@
       <div class="price-label">Total Monthly Cost</div>
       <div class="price" id="priceDisplay">$8,000</div>
       <div class="price-period">per month</div>
-      <div class="price-cap-note" id="priceCapNote"></div>
       <div class="tier-reason" id="tierReason">Mid-size company, growing marketing team, strong revenue.</div>
-
-      <div class="cost-breakdown">
-        <div class="cost-row">
-          <span class="cost-row-label">Base price</span>
-          <span class="cost-row-value" id="baseCostDisplay">$8,000</span>
-        </div>
-        <div class="cost-row integrations-row">
-          <span class="cost-row-label">Integrations add-on</span>
-          <span class="cost-row-value" id="integrationsCostDisplay">+$0</span>
-        </div>
-        <div class="integration-detail" id="integrationsDetail">All integrations included free.</div>
-        <div class="cost-row total-row">
-          <span class="cost-row-label">Monthly total</span>
-          <span class="cost-row-value" id="totalCostDisplay">$8,000</span>
-        </div>
-      </div>
 
       <div class="annual-cost">Annualized: <strong id="annualCost">$96,000</strong></div>
     </div>
@@ -796,9 +711,9 @@
       var integrations = parseInt(integrationsSlider.value);
 
       // Update readouts
-      document.getElementById('companyVal').textContent = company.toLocaleString('en-US') + ' people';
-      document.getElementById('marketingVal').textContent = marketing + (marketing === 1 ? ' person' : ' people');
-      document.getElementById('revenueVal').textContent = '$' + revenue + 'M';
+      document.getElementById('companyVal').textContent = (company === 1000 ? '1,000+' : company.toLocaleString('en-US')) + ' people';
+      document.getElementById('marketingVal').textContent = (marketing === 30 ? '30+' : marketing) + (marketing === 1 ? ' person' : ' people');
+      document.getElementById('revenueVal').textContent = '$' + revenue + (revenue === 500 ? 'M+' : 'M');
       document.getElementById('integrationsVal').textContent = (integrations === 25 ? '25+' : integrations) + ' integration' + (integrations === 1 ? '' : 's');
 
       var baseCost, reason;
@@ -856,7 +771,6 @@
       var paidIntegrations = Math.max(0, integrations - 3);
       var integrationCost = Math.floor(paidIntegrations / 2) * 750;
       var totalMonthly = Math.min(baseCost + integrationCost, 12000);
-      var isCapped = (baseCost + integrationCost) > 12000;
 
       // Plan name
       var planName = getPlanName(marketing);
@@ -868,24 +782,7 @@
       planBadge.className = 'plan-badge ' + planColor;
 
       document.getElementById('priceDisplay').textContent = formatCurrency(totalMonthly);
-      document.getElementById('priceCapNote').textContent = isCapped ? 'Price capped at $12,000/month.' : '';
       document.getElementById('tierReason').textContent = reason;
-
-      document.getElementById('baseCostDisplay').textContent = formatCurrency(baseCost);
-      document.getElementById('integrationsCostDisplay').textContent = integrationCost > 0 ? '+' + formatCurrency(integrationCost) : '+$0';
-      document.getElementById('totalCostDisplay').textContent = formatCurrency(totalMonthly);
-
-      // Integrations detail text
-      var detailEl = document.getElementById('integrationsDetail');
-      if (integrations <= 3) {
-        detailEl.textContent = 'All integrations included free.';
-      } else {
-        var freeCount = 3;
-        var additionalCount = paidIntegrations;
-        var pairs = Math.floor(paidIntegrations / 2);
-        detailEl.textContent = freeCount + ' integrations included free + ' + additionalCount + ' additional = ' + pairs + ' billable pair' + (pairs !== 1 ? 's' : '') + ' = +' + formatCurrency(integrationCost) + '/month';
-      }
-
       document.getElementById('annualCost').textContent = formatCurrency(totalMonthly * 12);
     }
 
