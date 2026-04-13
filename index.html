@@ -737,39 +737,59 @@
       // Rule 3: Scaled mid/large pricing
       else {
         var bigCompany = company >= 500;
-        var bigMarketing = marketing >= 20;
         var highRevenue = revenue > 200;
 
-        if (!bigCompany && !bigMarketing && !highRevenue) {
-          baseCost = 8000;
-          reason = 'Mid-size company, growing marketing team, strong revenue.';
-        } else if (!bigCompany && !bigMarketing && highRevenue) {
-          baseCost = 9500;
-          reason = 'Mid-size company, growing marketing team, high revenue.';
-        } else if (!bigCompany && bigMarketing && !highRevenue) {
-          baseCost = 9500;
-          reason = 'Mid-size company, large marketing team, strong revenue.';
-        } else if (!bigCompany && bigMarketing && highRevenue) {
-          baseCost = 11000;
-          reason = 'Mid-size company, large marketing team, high revenue \u2014 premium tier.';
-        } else if (bigCompany && !bigMarketing && !highRevenue) {
-          baseCost = 9500;
-          reason = 'Large company, growing marketing team, strong revenue.';
-        } else if (bigCompany && !bigMarketing && highRevenue) {
-          baseCost = 11000;
-          reason = 'Large company, growing marketing team, high revenue \u2014 premium tier.';
-        } else if (bigCompany && bigMarketing && !highRevenue) {
-          baseCost = 11000;
-          reason = 'Large company, large marketing team \u2014 premium tier.';
+        if (marketing < 15) {
+          // Marketing 10–14
+          if (!bigCompany && !highRevenue) {
+            baseCost = 8500;
+            reason = 'Mid-size company, growing marketing team, strong revenue.';
+          } else if (!bigCompany && highRevenue) {
+            baseCost = 9500;
+            reason = 'Mid-size company, growing marketing team, high revenue.';
+          } else if (bigCompany && !highRevenue) {
+            baseCost = 9500;
+            reason = 'Large company, growing marketing team, strong revenue.';
+          } else {
+            baseCost = 11000;
+            reason = 'Large company, growing marketing team, high revenue \u2014 premium tier.';
+          }
+        } else if (marketing < 20) {
+          // Marketing 15–19
+          if (!bigCompany && !highRevenue) {
+            baseCost = 9500;
+            reason = 'Mid-size company, mid-size marketing team, strong revenue.';
+          } else if (!bigCompany && highRevenue) {
+            baseCost = 9500;
+            reason = 'Mid-size company, mid-size marketing team, high revenue.';
+          } else if (bigCompany && !highRevenue) {
+            baseCost = 9500;
+            reason = 'Large company, mid-size marketing team, strong revenue.';
+          } else {
+            baseCost = 11000;
+            reason = 'Large company, mid-size marketing team, high revenue \u2014 premium tier.';
+          }
         } else {
-          baseCost = 12000;
-          reason = 'Large company, large marketing team, high revenue \u2014 maximum base tier.';
+          // Marketing 20+
+          if (!bigCompany && !highRevenue) {
+            baseCost = 9500;
+            reason = 'Mid-size company, large marketing team, strong revenue.';
+          } else if (!bigCompany && highRevenue) {
+            baseCost = 11000;
+            reason = 'Mid-size company, large marketing team, high revenue \u2014 premium tier.';
+          } else if (bigCompany && !highRevenue) {
+            baseCost = 11000;
+            reason = 'Large company, large marketing team \u2014 premium tier.';
+          } else {
+            baseCost = 12000;
+            reason = 'Large company, large marketing team, high revenue \u2014 maximum base tier.';
+          }
         }
       }
 
       // Integrations add-on
       var paidIntegrations = Math.max(0, integrations - 3);
-      var integrationCost = Math.floor(paidIntegrations / 2) * 750;
+      var integrationCost = Math.ceil(paidIntegrations / 2) * 750;
       var totalMonthly = Math.min(baseCost + integrationCost, 12000);
 
       // Plan name
