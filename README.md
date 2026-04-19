@@ -9,12 +9,6 @@ This project includes automated scrapers for legacy APIs,
 Playwright-based web scrapers, and an interactive Streamlit dashboard
 for exploring the data.
 
-SECURITY WARNING \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-- Before you push this to
-GitHub, you MUST ensure your authentication files (.columbia_token,
-.columbia_cookie, .webui_secret_key) are added to a .gitignore file. If
-you upload these to a public repository, anyone on the internet can
-access your Columbia account.
-
 FEATURES \-\-\-\-\-\-\-- \* Course Evaluation Downloader: Bypasses
 legacy API constraints to bulk-download official course evaluation PDFs
 across multiple terms and departments. \* CULPA Lore Scraper: Extracts
