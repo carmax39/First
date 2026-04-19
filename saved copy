@@ -1,0 +1,449 @@
+"""
+Columbia University Course Evaluation Bulk Downloader
+======================================================
+Downloads all available evaluation PDFs for a given term.
+
+Usage:
+    python columbia_eval_downloader.py
+
+Requirements:
+    pip install requests
+
+You need:
+1. Your Bearer token from the Vergil network tab (Authorization header)
+2. Your session cookies from vergil.columbia.edu (copy from DevTools)
+
+Steps to get your token:
+  - Open vergil.columbia.edu, login
+  - Open DevTools → Network tab
+  - Find any request to prod2-sas-studentrecords.api.columbia.edu
+  - Copy the Authorization: Bearer <token> value
+"""
+
+import requests
+import os
+import time
+import json
+import re
+
+# ============================================================
+# CONFIGURATION — FILL THESE IN
+# ============================================================
+
+# Token is read from (in priority order):
+#   1. COLUMBIA_TOKEN environment variable
+#   2. ./.columbia_token file (next to this script, single line)
+# Fallback hardcoded value below for quick testing only.
+def _load_token() -> str:
+    env = os.environ.get("COLUMBIA_TOKEN")
+    if env:
+        return env.strip()
+    token_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".columbia_token")
+    if os.path.exists(token_file):
+        with open(token_file) as f:
+            return f.read().strip()
+    return "nd5hAN8zFzLCybvbyJlEqhZYTI1I"  # last-resort fallback
+
+BEARER_TOKEN = _load_token()
+
+def _load_cookie() -> str:
+    env = os.environ.get("COLUMBIA_COOKIE")
+    if env:
+        return env.strip()
+    cookie_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".columbia_cookie")
+    if os.path.exists(cookie_file):
+        with open(cookie_file) as f:
+            return f.read().strip()
+    return ""
+
+COOKIE = _load_cookie()
+
+# Term codes:
+#   20253 = Fall 2025
+#   20261 = Spring 2026
+#   20263 = Fall 2026 (not happened yet — no evals)
+TERM = os.environ.get("COLUMBIA_TERM", "20243")
+
+# Test mode — only query the first N courses to verify the ID transform works.
+# Set via env var: TEST_MODE=1 (limits to 5 courses, skips PDF downloads).
+TEST_MODE = os.environ.get("TEST_MODE", "").lower() in ("1", "true", "yes")
+TEST_LIMIT = 5
+
+# Hard cap on courses to fetch + process. Set MAX_COURSES=0 for unlimited.
+MAX_COURSES = int(os.environ.get("MAX_COURSES", "1000"))
+
+# Output directory for downloaded PDFs
+OUTPUT_DIR = f"./columbia_evals_{TERM}"
+
+# Rate limiting — be polite to the server
+DELAY_BETWEEN_REQUESTS = 0.3  # seconds
+
+# ============================================================
+
+VERGIL_HEADERS = {
+    "accept": "application/json, text/plain, */*",
+    "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+    "authorization": f"Bearer {BEARER_TOKEN}",
+    "origin": "https://vergil.columbia.edu",
+    "priority": "u=1, i",
+    "referer": "https://vergil.columbia.edu/",
+    "sec-ch-ua": '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"macOS"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-site",
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+}
+if COOKIE:
+    VERGIL_HEADERS["cookie"] = COOKIE
+
+PDF_HEADERS = {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    "Referer": "https://vergil.columbia.edu/",
+}
+
+COURSE_SEARCH_URL = "https://prod2-sas-studentrecords.api.columbia.edu/v1/course_and_class_search"
+EVALKIT_URL = "https://prod2-sas-studentrecords.api.columbia.edu/legacy/evalkit"
+
+
+def get_all_courses(term: str) -> list[dict]:
+    """Fetch all courses offered in the given term via the Vergil course search API."""
+    print(f"\n📚 Fetching all courses for term {term}...")
+    all_courses = []
+    page = 1
+    page_size = 500
+
+    while True:
+        # Brackets must be sent raw — requests would percent-encode them and trip the gateway.
+        # `sort` and `has_classes` also trigger 502; matching the parameter set Vergil itself uses.
+        qs = (
+            f"term={term}"
+            f"&page[number]={page}"
+            f"&page[size]={page_size}"
+            f"&page[classes.size]=500"
+            f"&schedule=true"
+        )
+        url = f"{COURSE_SEARCH_URL}?{qs}"
+        resp = None
+        for attempt in range(4):
+            resp = requests.get(url, headers=VERGIL_HEADERS, timeout=30)
+            if resp.status_code == 200:
+                break
+            wait = 2 ** attempt
+            print(f"  ⚠️  Page {page} got {resp.status_code} (attempt {attempt+1}/4) — backing off {wait}s")
+            time.sleep(wait)
+        if resp is None or resp.status_code != 200:
+            print(f"  ❌ Course search gave up at page {page}: {resp.status_code if resp else 'no response'} — {resp.text[:300] if resp else ''}")
+            print(f"  ℹ️  Continuing with the {len(all_courses)} courses fetched so far.")
+            break
+
+        data = resp.json().get("data", {})
+        courses = data.get("courses", [])
+        total = data.get("total_count", 0)
+
+        all_courses.extend(courses)
+        print(f"  Page {page}: got {len(courses)} courses (total so far: {len(all_courses)} / {total})")
+
+        if MAX_COURSES and len(all_courses) >= MAX_COURSES:
+            all_courses = all_courses[:MAX_COURSES]
+            print(f"  🛑 Reached MAX_COURSES={MAX_COURSES}, stopping pagination.")
+            break
+
+        if len(all_courses) >= total or len(courses) == 0:
+            break
+
+        page += 1
+        time.sleep(DELAY_BETWEEN_REQUESTS)
+
+    print(f"  ✅ Total courses found: {len(all_courses)}")
+    return all_courses
+
+
+def extract_canvas_course_ids(course: dict) -> list[str]:
+    """
+    Extract the Canvas SIS course IDs from a Vergil course object.
+    
+    The evalkit API uses IDs like 'ACTUK5841' — derived from the class's
+    term_calendar_code + section. We pull class_identifier_term values
+    which follow the pattern SUBJECT+NUMBER+SUFFIX+SECTION+TERMCODE.
+    
+    The canvasCourseSisId in evalkit responses follows: SUBJECTKNUMBER_SECTION_YEAR_TERMDIGIT
+    e.g. ACTUK5841_001_2025_1
+    
+    We reconstruct this from Vergil's class data.
+    """
+    ids = set()
+    classes = course.get("class_data", {}).get("classes", [])
+    
+    for cls in classes:
+        # class_identifier_term example: ACTUPS5841_00120251
+        # section_code: "001"
+        # term_calendar_code: "20251"
+        section = cls.get("section_code", "")
+        term_cal = cls.get("term_calendar_code", "")  # e.g. "20261"
+        
+        if not term_cal or len(term_cal) != 5:
+            continue
+        
+        year = term_cal[:4]          # "2026"
+        term_digit = term_cal[4]     # "1" = Spring, "3" = Fall
+        
+        # course_identifier2 from the parent course e.g. "ACTUPS5841E"
+        course_id2 = course.get("course_identifier2", "")  # e.g. ACTUPS5841E
+        
+        # evalkit uses a "K" variant: ACTUPS -> ACTUK, COMS -> COMSK, etc.
+        # Pattern: replace the suffix letter (last char) with K
+        # Actually looking at the data: ACTUPS5841 -> ACTUK5841
+        # The suffix (E, UN, W etc) is stripped and replaced with K
+        
+        # Strip the suffix code to get the base: e.g. ACTUPS5841E -> ACTUPS5841
+        # Then replace the school prefix portion with K variant
+        # From examples: ACTUPS5841 -> ACTUK5841 (PS -> K)
+        # Let's extract from class_identifier which has the right prefix
+        
+        class_id = cls.get("class_identifier", "")  # e.g. "ACTUPS5841E001"
+        if not class_id:
+            continue
+            
+        # Extract base course code without section suffix
+        # class_identifier = SUBJECT+NUMBER+QUALIFIER+SECTION e.g. ACTUPS5841E046
+        # We want: ACTUK5841_001_2026_1
+        
+        # Use course_name (no suffix) from parent: e.g. "ACTUPS5841"
+        course_name = course.get("course_name", "")  # e.g. "ACTUPS5841"
+        
+        if not course_name:
+            continue
+        
+        # Build the canvas SIS ID by replacing suffix portion with K
+        # Looking at the pattern: ACTUPS -> ACTUK (replace last 2 chars of prefix with K)
+        # More generally, the subject code chars before the number, replace last 2 with K
+        # e.g. ACTUPS5841 -> subject=ACTUPS, number=5841
+        # ACTUPS -> ACTUK (drop PS, add K)... actually it's just: remove "PS" add "K"?
+        # Simpler: from the example ACTUPS5841 -> ACTUK5841, it seems "UPS" -> "UK"
+        
+        # Let's just try both the raw course_name and a K-substituted version
+        # and let the API tell us which works
+        
+        canvas_id = f"{course_name}_{section}_{year}_{term_digit}"
+        ids.add(canvas_id)
+        
+        # Also try K-substituted version (strip last 2 chars of alpha prefix, add K)
+        match = re.match(r'^([A-Z]+?)(\d+)$', course_name)
+        if match:
+            prefix, number = match.groups()
+            # Replace trailing letters after first meaningful part with K
+            # e.g. ACTUPS -> ACTUK, COMS -> COMSK (but COMS might just be COMSK)
+            # Try: if prefix ends with 'PS' -> replace with 'K'
+            # Or just try: prefix[:-2] + 'K' + number
+            if len(prefix) > 2:
+                k_prefix = prefix[:-2] + "K"
+                k_canvas_id = f"{k_prefix}{number}_{section}_{year}_{term_digit}"
+                ids.add(k_canvas_id)
+                # Also try dropping just 1 char
+                k_prefix2 = prefix[:-1] + "K"
+                ids.add(f"{k_prefix2}{number}_{section}_{year}_{term_digit}")
+    
+    return list(ids)
+
+
+_evalkit_debug_logged = False
+
+def get_evalkit_reports(canvas_course_id: str) -> list[dict]:
+    """Query the evalkit API for a given Canvas course ID."""
+    global _evalkit_debug_logged
+    resp = requests.get(
+        EVALKIT_URL,
+        params={"course_id": canvas_course_id},
+        headers=VERGIL_HEADERS,
+        timeout=15,
+    )
+
+    if resp.status_code != 200:
+        return []
+
+    try:
+        body = resp.json()
+    except Exception:
+        return []
+
+    if not _evalkit_debug_logged:
+        print(f"\n  🔬 evalkit raw response sample for {canvas_course_id}:")
+        print(f"    type={type(body).__name__}, top-level keys={list(body.keys()) if isinstance(body, dict) else 'N/A (list)'}")
+        sample = body if isinstance(body, list) else body.get("data", body)
+        if isinstance(sample, list) and sample:
+            first = sample[0]
+            print(f"    first item type={type(first).__name__}, value preview={str(first)[:300]}")
+        else:
+            print(f"    body preview={str(body)[:400]}")
+        _evalkit_debug_logged = True
+
+    # Tolerate both {"data": [...]} and bare [...] shapes
+    items = body if isinstance(body, list) else body.get("data", [])
+    if not isinstance(items, list):
+        return []
+    return [r for r in items if isinstance(r, dict) and r.get("reportLink")]
+
+
+def download_pdf(url: str, filepath: str) -> bool:
+    """Download a PDF from evaluationkit and save it."""
+    try:
+        resp = requests.get(url, headers=PDF_HEADERS, timeout=30, allow_redirects=True)
+        if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("application/pdf"):
+            with open(filepath, "wb") as f:
+                f.write(resp.content)
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"    ⚠️  Download error: {e}")
+        return False
+
+
+def safe_filename(s: str) -> str:
+    """Make a string safe for use as a filename."""
+    return re.sub(r'[<>:"/\\|?*]', '_', s)[:150]
+
+
+def main():
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    print(f"Columbia Evaluation Downloader")
+    print(f"Term: {TERM} → Output: {OUTPUT_DIR}/")
+    print(f"Token: {BEARER_TOKEN[:6]}…{BEARER_TOKEN[-4:]} ({len(BEARER_TOKEN)} chars)")
+    print(f"Cookie: {'YES (' + str(len(COOKIE)) + ' chars)' if COOKIE else 'MISSING — auth will likely fail'}")
+    if TEST_MODE:
+        print(f"🧪 TEST MODE — limiting to first {TEST_LIMIT} courses, skipping PDF downloads")
+
+    # Step 1: Get all courses
+    courses = get_all_courses(TERM)
+
+    # Dump the first course to disk so we can inspect its full structure
+    if courses:
+        sample_path = os.path.join(OUTPUT_DIR, "_sample_course.json")
+        with open(sample_path, "w") as f:
+            json.dump(courses[0], f, indent=2)
+        print(f"\n📋 First course full object dumped to: {sample_path}")
+        print(f"   Top-level keys: {list(courses[0].keys())}")
+
+    if TEST_MODE:
+        courses = courses[:TEST_LIMIT]
+    
+    if not courses:
+        print("No courses found. Check your token and term code.")
+        return
+    
+    # Step 2: For each course, get evalkit reports
+    print(f"\n🔍 Querying evalkit API for {len(courses)} courses...")
+    
+    all_reports = []
+    queried_base_ids = set()
+    
+    for i, course in enumerate(courses):
+        course_name = course.get("course_name", "")
+        course_title = course.get("course_official_title", "")
+        
+        if not course_name:
+            continue
+        
+        # Build the K-variant base ID for evalkit lookup
+        match = re.match(r'^([A-Z]+?)(\d+)$', course_name)
+        if not match:
+            continue
+        
+        prefix, number = match.groups()
+        
+        # Generate candidate base IDs to try
+        candidates = [course_name]  # e.g. ACTUPS5841
+        if len(prefix) >= 3:
+            candidates.append(prefix[:-2] + "K" + number)   # ACTUK5841
+            candidates.append(prefix[:-1] + "K" + number)   # ACTUPSK5841
+        
+        if TEST_MODE:
+            print(f"  [{i+1}/{len(courses)}] {course_name} → trying candidates: {candidates}")
+
+        matched = False
+        for base_id in candidates:
+            if base_id in queried_base_ids:
+                continue
+            queried_base_ids.add(base_id)
+
+            reports = get_evalkit_reports(base_id)
+            if TEST_MODE:
+                print(f"      ↪ {base_id}: {len(reports)} report(s)")
+            if reports:
+                if not TEST_MODE:
+                    print(f"  [{i+1}/{len(courses)}] ✅ {course_name} ({course_title[:40]}) → {len(reports)} eval(s) [matched as {base_id}]")
+                for r in reports:
+                    r["_course_name"] = course_name
+                    r["_course_title"] = course_title
+                all_reports.extend(reports)
+                matched = True
+                break
+
+            time.sleep(DELAY_BETWEEN_REQUESTS)
+
+        if TEST_MODE and not matched:
+            print(f"      ⚠️  no match for {course_name}")
+        
+        if (i + 1) % 50 == 0:
+            print(f"  ... progress: {i+1}/{len(courses)} courses checked, {len(all_reports)} reports found so far")
+    
+    print(f"\n📄 Found {len(all_reports)} evaluation reports with PDF links")
+    
+    if not all_reports:
+        print("No reports found. This term may not have evaluations yet, or the course ID format may differ.")
+        print("Tip: Check the network tab for the exact course_id format used in the evalkit request.")
+        return
+    
+    # Save the manifest
+    manifest_path = os.path.join(OUTPUT_DIR, "_manifest.json")
+    with open(manifest_path, "w") as f:
+        json.dump(all_reports, f, indent=2)
+    print(f"  Manifest saved to {manifest_path}")
+    
+    if TEST_MODE:
+        print("\n🧪 TEST MODE complete — skipping PDF downloads. Inspect manifest above.")
+        return
+
+    # Step 3: Download PDFs
+    print(f"\n⬇️  Downloading PDFs...")
+    
+    success = 0
+    failed = 0
+    
+    for report in all_reports:
+        url = report.get("reportLink")
+        if not url:
+            continue
+        
+        course_code = report.get("courseCode", "unknown")
+        term = report.get("term", "").replace(" ", "_")
+        instructor = f"{report.get('instructorLastname', '')}_{report.get('instructorFirstname', '')}"
+        
+        filename = safe_filename(f"{term}_{course_code}_{instructor}") + ".pdf"
+        filepath = os.path.join(OUTPUT_DIR, filename)
+        
+        if os.path.exists(filepath):
+            print(f"  ⏭️  Skipping (exists): {filename}")
+            success += 1
+            continue
+        
+        ok = download_pdf(url, filepath)
+        if ok:
+            size_kb = os.path.getsize(filepath) // 1024
+            print(f"  ✅ {filename} ({size_kb} KB)")
+            success += 1
+        else:
+            print(f"  ❌ Failed: {filename}")
+            failed += 1
+        
+        time.sleep(DELAY_BETWEEN_REQUESTS)
+    
+    print(f"\n🎉 Done! {success} downloaded, {failed} failed.")
+    print(f"PDFs saved to: {os.path.abspath(OUTPUT_DIR)}/")
+
+
+if __name__ == "__main__":
+    main()
